@@ -1,0 +1,73 @@
+service:
+  name: return-to-work
+
+plugins:
+  - serverless-bundle
+  - serverless-pseudo-parameters
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  memorySize: 256
+  stage: ${opt:stage, 'dev'}
+  region: us-west-1
+  environment:
+    USER_TABLE_NAME: ${self:custom.UserTable.name}
+    GOING_TO_WORK_TABLE_NAME: ${self:custom.GoingToWorkTable.name}
+    ADMIN_TABLE_NAME: ${self:custom.AdminTable.name}
+    MAIL_QUEUE_URL: ${self:custom.MailQueue.url}
+  iamRoleStatements:
+    - ${file(iam/UserTableIAM.yml):UserTableIAM}
+    - ${file(iam/AdminTableIAM.yml):AdminTableIAM}
+    - ${file(iam/GoingToWorkTableIAM.yml):GoingToWorkTableIAM}
+    - ${file(iam/MailQueueIAM.yml):MailQueueIAM}
+
+resources:
+  Resources:
+    UserTable: ${file(resources/UserTable.yml):UserTable}
+    GoingToWorkTable: ${file(resources/GoingToWorkTable.yml):GoingToWorkTable}
+    AdminTable: ${file(resources/AdminTable.yml):AdminTable}
+
+functions:
+  addEmail:
+    handler: src/handlers/addEmail.handler
+    events:
+      - http:
+          method: POST
+          path: /addEmail
+  addAdmin:
+    handler: src/handlers/addAdmin.handler
+    events:
+      - http:
+          method: POST
+          path: /addAdmin
+  addGoingToWork:
+    handler: src/handlers/addGoingToWork.handler
+    events:
+      - http:
+          method: GET
+          path: /addGoingToWork
+  getGoingToWork:
+    handler: src/handlers/getGoingToWork.handler
+    events:
+      - http:
+          method: GET
+          path: /getGoingToWork
+  processEmails:
+    handler: src/handlers/processEmails.handler
+  processAdmins:
+    handler: src/handlers/processAdmins.handler
+
+custom:
+  UserTable:
+    name: !Ref UserTable
+    arn: !GetAtt UserTable.Arn
+  GoingToWorkTable:
+    name: !Ref GoingToWorkTable
+    arn: !GetAtt GoingToWorkTable.Arn
+  AdminTable:
+    name: !Ref AdminTable
+    arn: !GetAtt AdminTable.Arn
+  MailQueue:
+    arn: ${cf:notification-service-${self:provider.stage}.MailQueueArn}
+    url: ${cf:notification-service-${self:provider.stage}.MailQueueUrl}

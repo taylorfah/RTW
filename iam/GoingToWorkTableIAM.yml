@@ -1,0 +1,8 @@
+GoingToWorkTableIAM:
+  Effect: Allow
+  Action:
+    - dynamodb:PutItem
+    - dynamodb:Query
+  Resource:
+    - ${self:custom.GoingToWorkTable.arn}
+    - !Join ['/', ['${self:custom.GoingToWorkTable.arn}', 'index', 'companyIdAndWorkDate']]

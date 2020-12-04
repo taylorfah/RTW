@@ -1,0 +1,26 @@
+GoingToWorkTable:
+  Type: AWS::DynamoDB::Table
+  Properties:
+    TableName: GoingToWorkTable
+    BillingMode: PAY_PER_REQUEST
+    AttributeDefinitions:
+      - AttributeName: id
+        AttributeType: S
+      - AttributeName: companyId
+        AttributeType: S
+      - AttributeName: workDate
+        AttributeType: S
+
+    KeySchema:
+      - AttributeName: id
+        KeyType: HASH
+
+    GlobalSecondaryIndexes:
+      - IndexName: companyIdAndWorkDate
+        KeySchema:
+          - AttributeName: companyId
+            KeyType: HASH
+          - AttributeName: workDate
+            KeyType: RANGE
+        Projection:
+          ProjectionType: ALL
