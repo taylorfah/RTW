@@ -21,6 +21,7 @@ async function processAdmins(event, context) {
         throw new createError.InternalServerError(error);
     }
 
+    // For each admin's company get all responses for tomorrow and send admin email.
     await Promise.all(_.map(admins, async admin  => {
         let goingToWork;
         let companyId = admin.companyId;
