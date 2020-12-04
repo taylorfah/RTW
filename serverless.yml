@@ -55,8 +55,12 @@ functions:
           path: /getGoingToWork
   processEmails:
     handler: src/handlers/processEmails.handler
+#     events:
+#      - schedule: cron(0 10 * * ? MON-FRI) # runs 10am mon-fri
   processAdmins:
     handler: src/handlers/processAdmins.handler
+#     events:
+#      - schedule: cron(0 16 * * ? MON-FRI) # runs 4pm mon-fri
 
 custom:
   UserTable:

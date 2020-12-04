@@ -58,7 +58,6 @@ async function processAdmins(event, context) {
             }
         });
 
-        console.log(admin);
         emailsToSend.push(
             sqs.sendMessage({
                 QueueUrl: process.env.MAIL_QUEUE_URL,
